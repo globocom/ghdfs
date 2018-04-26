@@ -6,10 +6,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, FileStatus, FileSystem, LocatedFileStatus, Path}
 import org.apache.commons.io.IOUtils
 
-class HdfsManager(hdfsFactory: HdfsFactory,
-                  configuration: Configuration = new Configuration){
-
-  val hdfs: FileSystem = hdfsFactory.fromConfiguration(configuration)
+class HdfsManager(hdfs: FileSystem) {
 
 
   private def validatePath(hadoopPath: Path): Path = {
@@ -32,7 +29,7 @@ class HdfsManager(hdfsFactory: HdfsFactory,
     hdfs.create(hadoopPath, true)
   }
 
-  def listFiles(hadoopPath: Path, recursive: Boolean = false): Iterator[LocatedFileStatus] =  {
+  def listFiles(hadoopPath: Path, recursive: Boolean = false): Iterator[LocatedFileStatus] = {
     RemoteIteratorWrapper[LocatedFileStatus](
       hdfs.listFiles(validatePath(hadoopPath), recursive)
     )
@@ -47,4 +44,23 @@ class HdfsManager(hdfsFactory: HdfsFactory,
     sourceFile.close()
     hdfs.delete(sourcePath, false)
   }
+
+}
+
+object HdfsManager {
+
+  def apply(): HdfsManager = apply(None, new Configuration())
+
+  def apply(hadoopConfDir: Option[String], conf: Configuration): HdfsManager = {
+    if (hadoopConfDir.nonEmpty) {
+      val confHdfs: Path = new Path(hadoopConfDir.get, "hdfs-site.xml")
+      val confCore: Path = new Path(hadoopConfDir.get, "core-site.xml")
+      conf.addResource(confHdfs)
+      conf.addResource(confCore)
+    }
+
+    val fs = FileSystem.get(conf)
+    new HdfsManager(fs)
+  }
+
 }
