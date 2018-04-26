@@ -51,7 +51,10 @@ object HdfsManager {
 
   def apply(): HdfsManager = apply(None, new Configuration())
 
+  def apply(hadoopConfDir: String): HdfsManager = apply(Some(hadoopConfDir), new Configuration())
+
   def apply(hadoopConfDir: Option[String], conf: Configuration): HdfsManager = {
+
     if (hadoopConfDir.nonEmpty) {
       val confHdfs: Path = new Path(hadoopConfDir.get, "hdfs-site.xml")
       val confCore: Path = new Path(hadoopConfDir.get, "core-site.xml")
