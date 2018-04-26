@@ -49,9 +49,11 @@ class HdfsManager(hdfs: FileSystem) {
 
 object HdfsManager {
 
-  def apply(): HdfsManager = apply(None, new Configuration())
+  def apply(): HdfsManager = apply(None)
 
-  def apply(hadoopConfDir: String): HdfsManager = apply(Some(hadoopConfDir), new Configuration())
+  def apply(hadoopConfDir: String): HdfsManager = apply(Option(hadoopConfDir))
+
+  def apply(hadoopConfDir: Option[String]): HdfsManager = apply(hadoopConfDir, new Configuration())
 
   def apply(hadoopConfDir: Option[String], conf: Configuration): HdfsManager = {
 
