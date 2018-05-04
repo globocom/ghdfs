@@ -2,10 +2,11 @@ package com.globo.bigdata.ghdfs
 
 import java.io.File
 
+import org.apache.commons.io.FileUtils
 import org.apache.hadoop.conf.Configuration
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{FSDataInputStream, FileSystem, Path}
 
 class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with BeforeAndAfter {
 
@@ -40,5 +41,17 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
     val hdfsReader = HdfsManager()
     val returnedClass = hdfsReader.listFiles(new Path("src/test/resources/")).getClass.getName
     returnedClass shouldEqual "com.globo.bigdata.ghdfs.RemoteIteratorWrapper"
+  }
+
+  it should "Merge files from hadoop path to another hadoop path" in {
+    val hdfsReader = HdfsManager()
+    val toMergePath = new Path("src/test/resources/mergetest/")
+    val destinationPath = new Path("src/test/resources/merged_file")
+
+    val isMerged = hdfsReader.copyMerge(toMergePath, destinationPath, false, "\n")
+
+    isMerged shouldEqual true
+
+    FileSystem.get(new Configuration()).delete(destinationPath, false)
   }
 }
