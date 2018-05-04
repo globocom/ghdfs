@@ -48,7 +48,7 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
     val toMergePath = new Path("src/test/resources/mergetest/")
     val destinationPath = new Path("src/test/resources/merged_file")
 
-    val isMerged = hdfsReader.copyMerge(toMergePath, destinationPath)
+    val isMerged = hdfsReader.copyMerge(toMergePath, destinationPath, false, "\n")
 
     isMerged shouldEqual true
 

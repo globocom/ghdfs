@@ -45,12 +45,12 @@ class HdfsManager(hdfs: FileSystem) {
     hdfs.delete(sourcePath, false)
   }
 
-  def copyMerge(sourcePath: Path, destinationPath: Path, deleteSource: Boolean = false): Boolean = {
+  def copyMerge(sourcePath: Path, destinationPath: Path, deleteSource: Boolean, separatorString: String): Boolean = {
     if (!hdfs.exists(sourcePath)) {
       throw new IOException(s"Path ${sourcePath.toString} not found in hadoop")
     }
 
-    FileUtil.copyMerge(hdfs, sourcePath, hdfs, destinationPath, deleteSource, hdfs.getConf, "\n")
+    FileUtil.copyMerge(hdfs, sourcePath, hdfs, destinationPath, deleteSource, hdfs.getConf, separatorString)
   }
 }
 
