@@ -3,7 +3,7 @@ package com.globo.bigdata.ghdfs
 import java.io.IOException
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, FileStatus, FileSystem, LocatedFileStatus, Path}
+import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, FileStatus, FileSystem, LocatedFileStatus, Path, FileUtil}
 import org.apache.commons.io.IOUtils
 
 class HdfsManager(hdfs: FileSystem) {
@@ -45,6 +45,13 @@ class HdfsManager(hdfs: FileSystem) {
     hdfs.delete(sourcePath, false)
   }
 
+  def copyMerge(sourcePath: Path, destinationPath: Path, deleteSource: Boolean = false): Boolean = {
+    if (!hdfs.exists(sourcePath)) {
+      throw new IOException(s"Path ${sourcePath.toString} not found in hadoop")
+    }
+
+    FileUtil.copyMerge(hdfs, sourcePath, hdfs, destinationPath, deleteSource, hdfs.getConf, "\n")
+  }
 }
 
 object HdfsManager {
