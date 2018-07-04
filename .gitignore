@@ -59,10 +59,10 @@ local.properties
 .worksheet
 
 ### Eclipse Patch ###
-# Eclipse Core		
+# Eclipse Core
 .project
 
-# JDT-specific (Eclipse Java Development Tools)		
+# JDT-specific (Eclipse Java Development Tools)
 .classpath
 
 ### Intellij ###
@@ -164,3 +164,4 @@ project/plugins/project/
 mainRunner
 
 # End of https://www.gitignore.io/api/sbt,linux,scala,eclipse,intellij
+.scannerwork

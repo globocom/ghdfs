@@ -13,3 +13,6 @@ compile:
 
 release:
 	@$(SBT_CLIENT) release
+
+sonar:
+	@$(SBT_CLIENT) clean coverage test coverageReport scapegoat sonarScan
