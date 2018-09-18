@@ -8,7 +8,6 @@ import org.apache.commons.io.IOUtils
 
 class HdfsManager(hdfs: FileSystem) {
 
-
   private def validatePath(hadoopPath: Path): Path = {
 
     if (!hdfs.exists(hadoopPath)) {
@@ -31,8 +30,13 @@ class HdfsManager(hdfs: FileSystem) {
 
   def listFiles(hadoopPath: Path, recursive: Boolean = false): Iterator[LocatedFileStatus] = {
     RemoteIteratorWrapper[LocatedFileStatus](
-      hdfs.listFiles(validatePath(hadoopPath), recursive)
-    )
+      hdfs.listFiles(validatePath(hadoopPath), recursive))
+  }
+
+  def delete(hadoopPath: Path, recursive: Boolean = false) = {
+    if (hdfs.exists(hadoopPath)) {
+      hdfs.delete(hadoopPath, recursive)
+    }
   }
 
   def move(sourcePath: Path, destinationPath: Path): Unit = {
@@ -74,5 +78,4 @@ object HdfsManager {
     val fs = FileSystem.get(conf)
     new HdfsManager(fs)
   }
-
 }

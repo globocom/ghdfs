@@ -7,6 +7,7 @@ import org.apache.hadoop.conf.Configuration
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
 import org.apache.hadoop.fs.{FSDataInputStream, FileSystem, Path}
+import java.io.IOException
 
 class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with BeforeAndAfter {
 
@@ -53,5 +54,67 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
     isMerged shouldEqual true
 
     FileSystem.get(new Configuration()).delete(destinationPath, false)
+  }
+}
+
+class HdfsManagerDeleteTest extends FlatSpec with Matchers with MockFactory with BeforeAndAfter {
+
+  behavior of "delete"
+
+  val workDir = "/tmp/ghdfs-" + System.currentTimeMillis()
+
+  before {
+    new File(workDir).mkdir()
+  }
+
+  after {
+    FileUtils.deleteDirectory(new File(workDir))
+  }
+
+  it should "recursively" in {
+    val dir = workDir + "/1"
+
+    new File(dir).mkdir()
+    new File(dir + "/file").createNewFile()
+
+    val hdfsReader = HdfsManager()
+    hdfsReader.delete(new Path(dir), true)
+
+    new File(dir).exists() shouldBe false
+  }
+
+  it should "Directory not recursively " in {
+    val dir = workDir + "/2"
+
+    new File(dir).mkdir()
+    new File(dir + "/file").createNewFile()
+
+    val hdfsReader = HdfsManager()
+
+    assertThrows[IOException] {
+      hdfsReader.delete(new Path(dir), false)
+    }
+
+    new File(dir).exists() shouldBe true
+  }
+
+  it should "File not recursively" in {
+    val dir = workDir + "/3"
+
+    new File(dir).createNewFile()
+
+    val hdfsReader = HdfsManager()
+    hdfsReader.delete(new Path(dir), false)
+
+    new File(dir).exists() shouldBe false
+  }
+
+  it should "Unexisted file without error" in {
+    val dir = workDir + "/4"
+
+    val hdfsReader = HdfsManager()
+    hdfsReader.delete(new Path(dir), false)
+
+    new File(dir).exists() shouldBe false
   }
 }
