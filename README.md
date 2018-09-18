@@ -26,6 +26,7 @@ Include in your dependencies:
     hdfs.move(Path, Path)
     
     hdfs.listFiles(Path, recursive = false).foreach(...)
-
+    
+    hdfs.delete(Path, recursive = true)
 ```
 
