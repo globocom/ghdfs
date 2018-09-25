@@ -6,7 +6,6 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
 import org.apache.hadoop.fs.{FSDataInputStream, FileSystem, Path}
 
-
 class ConversionsTest extends FlatSpec with Matchers with MockFactory with BeforeAndAfter {
 
   it should "Invoke hasNext of RemoteIterator on hasNext of RemoteIteratorWrapper" in {
@@ -24,9 +23,7 @@ class ConversionsTest extends FlatSpec with Matchers with MockFactory with Befor
   it should "Returns true when has next" in {
     val mockRemote = stub[org.apache.hadoop.fs.RemoteIterator[String]]
 
-
     val wrapper = RemoteIteratorWrapper[String](mockRemote)
-
 
     (mockRemote.hasNext _).when().returns(true)
 
@@ -37,13 +34,35 @@ class ConversionsTest extends FlatSpec with Matchers with MockFactory with Befor
   it should "Returns false when doesn't have next" in {
     val mockRemote = stub[org.apache.hadoop.fs.RemoteIterator[String]]
 
-
     val wrapper = RemoteIteratorWrapper[String](mockRemote)
-
 
     (mockRemote.hasNext _).when().returns(false)
 
     assert(wrapper.hasNext == false)
+
+  }
+
+  it should "Invoke RemoteIterator next method on RemoteIteratorWrapper next" in {
+
+    val mockRemote = mock[org.apache.hadoop.fs.RemoteIterator[String]]
+
+    (mockRemote.next _).expects().once()
+
+    val wrapper = RemoteIteratorWrapper[String](mockRemote)
+
+    wrapper.next
+
+  }
+
+  it should "Returns RemoteIterator next value on RemoteIteratorWrapper next" in {
+
+    val mockRemote = stub[org.apache.hadoop.fs.RemoteIterator[String]]
+
+    (mockRemote.next _).when().returns("munaro id")
+
+    val wrapper = RemoteIteratorWrapper[String](mockRemote)
+
+    assert(wrapper.next() == "munaro id")
 
   }
 
