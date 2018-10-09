@@ -55,6 +55,19 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
 
     FileSystem.get(new Configuration()).delete(destinationPath, false)
   }
+
+
+  it should "Raise IOException if source path does not exist in copyMerge" in {
+    val hdfsReader = HdfsManager()
+    val toMergePath = new Path("doesnt_exists")
+    val destinationPath = new Path("src/test/resources/merged_file")
+
+    assertThrows[IOException]{
+      hdfsReader.copyMerge(toMergePath, destinationPath, false, "\n")
+    }
+
+  }
+
 }
 
 class HdfsManagerDeleteTest extends FlatSpec with Matchers with MockFactory with BeforeAndAfter {
