@@ -11,13 +11,24 @@ class HdfsManager(hdfs: FileSystem) {
   private def validatePath(hadoopPath: Path): Path = {
 
     if (!hdfs.exists(hadoopPath)) {
-      throw new IOException(s"Path ${hadoopPath.toString} not found in hadoop")
+      throw new GHdfsIOException(s"Path ${hadoopPath.toString} not found in hadoop")
     }
     hadoopPath
   }
 
+  /**
+    * @param hadoopPath The path we want information from
+    * @return a FileStatus object that represents the path
+    * @throws GHdfsIOException when the path does not exist
+    * @see [[com.globo.bigdata.ghdfs.GHdfsIOException]]
+    */
   def status(hadoopPath: Path): FileStatus = {
-    hdfs.getFileStatus(validatePath(hadoopPath))
+    try {
+      hdfs.getFileStatus(validatePath(hadoopPath))
+    } catch {
+      case e: java.io.IOException => throw new GHdfsIOException(e)
+      case e: _ => throw e
+    }
   }
 
   def read(hadoopPath: Path): FSDataInputStream = {
