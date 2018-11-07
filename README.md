@@ -9,7 +9,7 @@ Package is under com.globo.bigdata.ghdfs_2.11-0.0.1
 Include in your dependencies:
 
 ```
-    "com.globo.bigdata" %% "ghdfs" % "0.0.6"
+    "com.globo.bigdata" %% "ghdfs" % "0.0.7"
 ```
 
 ## Usage
@@ -28,6 +28,8 @@ Include in your dependencies:
     hdfs.listFiles(Path, recursive = false).foreach(...)
     
     hdfs.delete(Path, recursive = true)
+
+    etc...
 ```
 
 # Tests
