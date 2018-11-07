@@ -4,7 +4,7 @@ Works with HDFS for common operations.
 
 ## Installation
 
-Package is under com.globo.bigdata.ghdfs_2.11-0.0.1
+Package is under com.globo.bigdata.ghdfs
 
 Include in your dependencies:
 
