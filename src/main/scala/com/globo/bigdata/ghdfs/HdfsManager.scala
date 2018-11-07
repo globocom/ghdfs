@@ -3,10 +3,12 @@ package com.globo.bigdata.ghdfs
 import java.io.IOException
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, FileStatus, FileSystem, LocatedFileStatus, Path, FileUtil}
+import org.apache.hadoop.fs._
 import org.apache.commons.io.IOUtils
+import org.apache.hadoop.hdfs.DistributedFileSystem
 
-class HdfsManager(hdfs: FileSystem) {
+
+class HdfsManager(hdfs: FileSystem) extends DistributedFileSystem{
 
   private def validatePath(hadoopPath: Path): Path = {
 
@@ -16,27 +18,34 @@ class HdfsManager(hdfs: FileSystem) {
     hadoopPath
   }
 
+
   def status(hadoopPath: Path): FileStatus = {
     hdfs.getFileStatus(validatePath(hadoopPath))
   }
 
-  def read(hadoopPath: Path): FSDataInputStream = {
+  override def open(hadoopPath: Path): FSDataInputStream = {
     hdfs.open(validatePath(hadoopPath))
   }
 
-  def write(hadoopPath: Path): FSDataOutputStream = {
+  def read(hadoopPath: Path): FSDataInputStream = open(hadoopPath)
+
+  override def create(hadoopPath: Path): FSDataOutputStream = {
     hdfs.create(hadoopPath, true)
   }
 
-  def listFiles(hadoopPath: Path, recursive: Boolean = false): Iterator[LocatedFileStatus] = {
+
+  def write(hadoopPath: Path): FSDataOutputStream = create(hadoopPath: Path)
+
+  def list(hadoopPath: Path, recursive: Boolean = false): Iterator[LocatedFileStatus] = {
     RemoteIteratorWrapper[LocatedFileStatus](
       hdfs.listFiles(validatePath(hadoopPath), recursive))
   }
 
-  def delete(hadoopPath: Path, recursive: Boolean = false) = {
-    if (hdfs.exists(hadoopPath)) {
-      hdfs.delete(hadoopPath, recursive)
+  override def delete(f: Path, recursive: Boolean): Boolean = {
+    if (hdfs.exists(f)) {
+      hdfs.delete(f, recursive)
     }
+    false
   }
 
   def move(sourcePath: Path, destinationPath: Path): Unit = {
@@ -60,13 +69,13 @@ class HdfsManager(hdfs: FileSystem) {
 
 object HdfsManager {
 
-  def apply(): HdfsManager = apply(None)
+  def apply(): FileSystem = apply(None)
 
-  def apply(hadoopConfDir: String): HdfsManager = apply(Option(hadoopConfDir))
+  def apply(hadoopConfDir: String): FileSystem = apply(Option(hadoopConfDir))
 
-  def apply(hadoopConfDir: Option[String]): HdfsManager = apply(hadoopConfDir, new Configuration())
+  def apply(hadoopConfDir: Option[String]): FileSystem = apply(hadoopConfDir, new Configuration())
 
-  def apply(hadoopConfDir: Option[String], conf: Configuration): HdfsManager = {
+  def apply(hadoopConfDir: Option[String], conf: Configuration, fsFactory: FileSystemFactory = new FileSystemFactory()): FileSystem = {
 
     if (hadoopConfDir.nonEmpty) {
       val confHdfs: Path = new Path(hadoopConfDir.get, "hdfs-site.xml")
@@ -75,7 +84,12 @@ object HdfsManager {
       conf.addResource(confCore)
     }
 
-    val fs = FileSystem.get(conf)
-    new HdfsManager(fs)
+    val fs = fsFactory.get(conf)
+
+    if (fs.isInstanceOf[DistributedFileSystem]){
+      new HdfsManager(fs)
+    } else {
+      fs
+    }
   }
 }
