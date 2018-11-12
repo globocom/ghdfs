@@ -2,13 +2,14 @@ package com.globo.bigdata.ghdfs
 
 import java.io.IOException
 
+import org.apache.commons.io.IOUtils
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs._
-import org.apache.commons.io.IOUtils
 import org.apache.hadoop.hdfs.DistributedFileSystem
 
+trait HdfsManager extends FileSystem {
 
-class HdfsManager(hdfs: FileSystem) extends DistributedFileSystem{
+  protected val hdfs: FileSystem
 
   private def validatePath(hadoopPath: Path): Path = {
 
@@ -69,13 +70,13 @@ class HdfsManager(hdfs: FileSystem) extends DistributedFileSystem{
 
 object HdfsManager {
 
-  def apply(): FileSystem = apply(None)
+  def apply(): HdfsManager = apply(None)
 
-  def apply(hadoopConfDir: String): FileSystem = apply(Option(hadoopConfDir))
+  def apply(hadoopConfDir: String): HdfsManager = apply(Option(hadoopConfDir))
 
-  def apply(hadoopConfDir: Option[String]): FileSystem = apply(hadoopConfDir, new Configuration())
+  def apply(hadoopConfDir: Option[String]): HdfsManager = apply(hadoopConfDir, new Configuration())
 
-  def apply(hadoopConfDir: Option[String], conf: Configuration, fsFactory: FileSystemFactory = new FileSystemFactory()): FileSystem = {
+  def apply(hadoopConfDir: Option[String], conf: Configuration, fsFactory: FileSystemFactory = new FileSystemFactory()): HdfsManager = {
 
     if (hadoopConfDir.nonEmpty) {
       val confHdfs: Path = new Path(hadoopConfDir.get, "hdfs-site.xml")
@@ -84,12 +85,11 @@ object HdfsManager {
       conf.addResource(confCore)
     }
 
-    val fs = fsFactory.get(conf)
-
+    val fs: FileSystem = fsFactory.get(conf)
     if (fs.isInstanceOf[DistributedFileSystem]){
-      new HdfsManager(fs)
+      new DistributedHdfsManager(fs)
     } else {
-      fs
+      new LocalHdfsManager(fs)
     }
   }
 }
