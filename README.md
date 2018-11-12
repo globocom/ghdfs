@@ -9,7 +9,7 @@ Package is under com.globo.bigdata.ghdfs
 Include in your dependencies:
 
 ```
-    "com.globo.bigdata" %% "ghdfs" % "0.0.7"
+    "com.globo.bigdata" %% "ghdfs" % "0.0.8"
 ```
 
 ## Usage
