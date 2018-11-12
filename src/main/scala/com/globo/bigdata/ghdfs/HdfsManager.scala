@@ -5,32 +5,37 @@ import java.io.IOException
 import org.apache.commons.io.IOUtils
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs._
-import org.apache.hadoop.hdfs.DistributedFileSystem
+import scala.language.dynamics
 
-trait HdfsManager extends FileSystem {
+class HdfsManager(hdfs: FileSystem) extends Dynamic {
 
-  protected val hdfs: FileSystem
+  def applyDynamic(methodName: String)(args: AnyRef*): AnyRef = {
+    val method = hdfs.getClass.getMethod(methodName, args.map(_.getClass):_*)
+    method.invoke(hdfs, args: _*)
+  }
 
   private def validatePath(hadoopPath: Path): Path = {
-
     if (!hdfs.exists(hadoopPath)) {
       throw new IOException(s"Path ${hadoopPath.toString} not found in hadoop")
     }
     hadoopPath
   }
 
+  def getFileSystem(): FileSystem = {
+    hdfs
+  }
 
   def status(hadoopPath: Path): FileStatus = {
     hdfs.getFileStatus(validatePath(hadoopPath))
   }
 
-  override def open(hadoopPath: Path): FSDataInputStream = {
+  def open(hadoopPath: Path): FSDataInputStream = {
     hdfs.open(validatePath(hadoopPath))
   }
 
   def read(hadoopPath: Path): FSDataInputStream = open(hadoopPath)
 
-  override def create(hadoopPath: Path): FSDataOutputStream = {
+  def create(hadoopPath: Path): FSDataOutputStream = {
     hdfs.create(hadoopPath, true)
   }
 
@@ -42,7 +47,7 @@ trait HdfsManager extends FileSystem {
       hdfs.listFiles(validatePath(hadoopPath), recursive))
   }
 
-  override def delete(f: Path, recursive: Boolean): Boolean = {
+  def delete(f: Path, recursive: Boolean): Boolean = {
     if (hdfs.exists(f)) {
       hdfs.delete(f, recursive)
     }
@@ -86,10 +91,7 @@ object HdfsManager {
     }
 
     val fs: FileSystem = fsFactory.get(conf)
-    if (fs.isInstanceOf[DistributedFileSystem]){
-      new DistributedHdfsManager(fs)
-    } else {
-      new LocalHdfsManager(fs)
-    }
+    new HdfsManager(fs)
+
   }
 }

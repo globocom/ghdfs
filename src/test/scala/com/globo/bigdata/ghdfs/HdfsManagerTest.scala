@@ -6,7 +6,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.hadoop.conf.Configuration
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{FileStatus, FileSystem, Path}
 import java.io.IOException
 
 import org.apache.hadoop.hdfs.DistributedFileSystem
@@ -16,7 +16,7 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
 
   it should "Get Local Filesystem without hadoop configuration" in {
     val hdfsReader = HdfsManager()
-    hdfsReader.getClass.getName.contains("LocalHdfsManager") shouldBe true
+    hdfsReader.getFileSystem().getClass.getName.contains("LocalFileSystem") shouldBe true
 
   }
 
@@ -30,23 +30,31 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
 
     val hdfsReader = HdfsManager(confDir, conf, mockFs)
 
-    hdfsReader.getClass.getName.contains("DistributedHdfsManager") shouldBe true
+    hdfsReader.getFileSystem().getClass.getName.contains("DistributedFileSystem") shouldBe true
 
   }
 
   it should "Get status from hadoop path" in {
 
     val fs = FileSystem.get(new Configuration())
-    val hdfsReader = new DistributedHdfsManager(fs)
+    val hdfsReader = new HdfsManager(fs)
     val returnedClass = hdfsReader.status(new Path("src/test/resources/segment_ids.csv"))
     returnedClass.isDirectory shouldEqual false
     returnedClass.getLen shouldEqual 746
   }
 
+  it should "Get status from hadoop path normal api" in {
+
+    val fs = FileSystem.get(new Configuration())
+    val hdfsReader = new HdfsManager(fs)
+    val returnedClass = hdfsReader.getFileStatus(new Path("src/test/resources/segment_ids.csv"))
+    returnedClass.asInstanceOf[FileStatus].getPath.toString shouldEqual "file:/Users/diogo.munaro/workspace/ghdfs/src/test/resources/segment_ids.csv"
+  }
+
   it should "Read from hadoop path" in {
 
     val fs = FileSystem.get(new Configuration())
-    val hdfsReader = new DistributedHdfsManager(fs)
+    val hdfsReader = new HdfsManager(fs)
     val returnedClass = hdfsReader.read(new Path("src/test/resources/segment_ids.csv")).getClass.getName
     returnedClass shouldEqual "org.apache.hadoop.fs.ChecksumFileSystem$FSDataBoundedInputStream"
   }
@@ -55,7 +63,7 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
 
     val testPath = new Path("src/test/resources/new.csv")
     val fs = FileSystem.get(new Configuration())
-    val hdfsReader = new DistributedHdfsManager(fs)
+    val hdfsReader = new HdfsManager(fs)
     val returnedClass = hdfsReader.write(testPath).getClass.getName
     returnedClass shouldEqual "org.apache.hadoop.fs.FSDataOutputStream"
 
@@ -66,14 +74,14 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
   it should "List files from hadoop path" in {
 
     val fs = FileSystem.get(new Configuration())
-    val hdfsReader = new DistributedHdfsManager(fs)
+    val hdfsReader = new HdfsManager(fs)
     val returnedClass = hdfsReader.list(new Path("src/test/resources/")).getClass.getName
     returnedClass shouldEqual "com.globo.bigdata.ghdfs.RemoteIteratorWrapper"
   }
 
   it should "Merge files from hadoop path to another hadoop path" in {
     val fs = FileSystem.get(new Configuration())
-    val hdfsReader = new DistributedHdfsManager(fs)
+    val hdfsReader = new HdfsManager(fs)
     val toMergePath = new Path("src/test/resources/mergetest/")
     val destinationPath = new Path("src/test/resources/merged_file")
 
@@ -87,7 +95,7 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
 
   it should "Raise IOException if source path does not exist in copyMerge" in {
     val fs = FileSystem.get(new Configuration())
-    val hdfsReader = new DistributedHdfsManager(fs)
+    val hdfsReader = new HdfsManager(fs)
     val toMergePath = new Path("doesnt_exists")
     val destinationPath = new Path("src/test/resources/merged_file")
 
@@ -120,7 +128,7 @@ class HdfsManagerDeleteTest extends FlatSpec with Matchers with MockFactory with
     new File(dir + "/file").createNewFile()
 
     val fs = FileSystem.get(new Configuration())
-    val hdfsReader = new DistributedHdfsManager(fs)
+    val hdfsReader = new HdfsManager(fs)
     hdfsReader.delete(new Path(dir), true)
 
     new File(dir).exists() shouldBe false
@@ -133,7 +141,7 @@ class HdfsManagerDeleteTest extends FlatSpec with Matchers with MockFactory with
     new File(dir + "/file").createNewFile()
 
     val fs = FileSystem.get(new Configuration())
-    val hdfsReader = new DistributedHdfsManager(fs)
+    val hdfsReader = new HdfsManager(fs)
 
     assertThrows[IOException] {
       hdfsReader.delete(new Path(dir), false)
@@ -148,7 +156,7 @@ class HdfsManagerDeleteTest extends FlatSpec with Matchers with MockFactory with
     new File(dir).createNewFile()
 
     val fs = FileSystem.get(new Configuration())
-    val hdfsReader = new DistributedHdfsManager(fs)
+    val hdfsReader = new HdfsManager(fs)
     hdfsReader.delete(new Path(dir), false)
 
     new File(dir).exists() shouldBe false
@@ -158,7 +166,7 @@ class HdfsManagerDeleteTest extends FlatSpec with Matchers with MockFactory with
     val dir = workDir + "/4"
 
     val fs = FileSystem.get(new Configuration())
-    val hdfsReader = new DistributedHdfsManager(fs)
+    val hdfsReader = new HdfsManager(fs)
     hdfsReader.delete(new Path(dir), false)
 
     new File(dir).exists() shouldBe false

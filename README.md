@@ -9,7 +9,7 @@ Package is under com.globo.bigdata.ghdfs
 Include in your dependencies:
 
 ```
-    "com.globo.bigdata" %% "ghdfs" % "0.0.8"
+    "com.globo.bigdata" %% "ghdfs" % "0.0.9"
 ```
 
 ## Usage
@@ -30,6 +30,18 @@ Include in your dependencies:
     hdfs.delete(Path, recursive = true)
 
     etc...
+```
+
+### Get Filesystem Instance
+
+```
+    hdfs.getFileSystem
+```
+
+### Use normal API
+```
+    val status = hdfs.getFileStatus(new Path("my_path.txt"))
+    status.asInstanceOf[FileStatus].getPath.toString
 ```
 
 # Tests
