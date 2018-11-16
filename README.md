@@ -41,11 +41,19 @@ Include in your dependencies:
 # Tests
 
 ```bash
-sbt test
+make test
 ```
 
-# Publish
+# Publish Test
+
+Follow this tutorial: https://leonard.io/blog/2017/01/an-in-depth-guide-to-deploying-to-maven-central/
 
 ```
-sbt release
+make snapshot
+```
+
+# Publish Test
+
+```
+make release
 ```
