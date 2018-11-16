@@ -16,7 +16,7 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
 
   it should "Get Local Filesystem without hadoop configuration" in {
     val hdfsReader = HdfsManager()
-    hdfsReader.getFileSystem().getClass.getName.contains("LocalFileSystem") shouldBe true
+    hdfsReader.getFS.getClass.getName.contains("LocalFileSystem") shouldBe true
 
   }
 
@@ -30,7 +30,7 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
 
     val hdfsReader = HdfsManager(confDir, conf, mockFs)
 
-    hdfsReader.getFileSystem().getClass.getName.contains("DistributedFileSystem") shouldBe true
+    hdfsReader.getFS.getClass.getName.contains("DistributedFileSystem") shouldBe true
 
   }
 
@@ -41,14 +41,6 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
     val returnedClass = hdfsReader.status(new Path("src/test/resources/segment_ids.csv"))
     returnedClass.isDirectory shouldEqual false
     returnedClass.getLen shouldEqual 746
-  }
-
-  it should "Get status from hadoop path normal api" in {
-
-    val fs = FileSystem.get(new Configuration())
-    val hdfsReader = new HdfsManager(fs)
-    val returnedClass = hdfsReader.getFileStatus(new Path("src/test/resources/segment_ids.csv"))
-    returnedClass.asInstanceOf[FileStatus].getPath.toString shouldEqual "file:/Users/diogo.munaro/workspace/ghdfs/src/test/resources/segment_ids.csv"
   }
 
   it should "Read from hadoop path" in {
@@ -75,7 +67,7 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
 
     val fs = FileSystem.get(new Configuration())
     val hdfsReader = new HdfsManager(fs)
-    val returnedClass = hdfsReader.list(new Path("src/test/resources/")).getClass.getName
+    val returnedClass = hdfsReader.listFiles(new Path("src/test/resources/")).getClass.getName
     returnedClass shouldEqual "com.globo.bigdata.ghdfs.RemoteIteratorWrapper"
   }
 

@@ -5,14 +5,8 @@ import java.io.IOException
 import org.apache.commons.io.IOUtils
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs._
-import scala.language.dynamics
 
-class HdfsManager(hdfs: FileSystem) extends Dynamic {
-
-  def applyDynamic(methodName: String)(args: AnyRef*): AnyRef = {
-    val method = hdfs.getClass.getMethod(methodName, args.map(_.getClass):_*)
-    method.invoke(hdfs, args: _*)
-  }
+class HdfsManager(hdfs: FileSystem) {
 
   private def validatePath(hadoopPath: Path): Path = {
     if (!hdfs.exists(hadoopPath)) {
@@ -21,9 +15,7 @@ class HdfsManager(hdfs: FileSystem) extends Dynamic {
     hadoopPath
   }
 
-  def getFileSystem(): FileSystem = {
-    hdfs
-  }
+  def getFS: FileSystem = hdfs
 
   def status(hadoopPath: Path): FileStatus = {
     hdfs.getFileStatus(validatePath(hadoopPath))
@@ -42,9 +34,26 @@ class HdfsManager(hdfs: FileSystem) extends Dynamic {
 
   def write(hadoopPath: Path): FSDataOutputStream = create(hadoopPath: Path)
 
-  def list(hadoopPath: Path, recursive: Boolean = false): Iterator[LocatedFileStatus] = {
-    RemoteIteratorWrapper[LocatedFileStatus](
-      hdfs.listFiles(validatePath(hadoopPath), recursive))
+  def list[T](hadoopPath: Path, caller: Path => RemoteIterator[T]): Iterator[T] = {
+    RemoteIteratorWrapper[T](
+      caller(validatePath(hadoopPath))
+    )
+  }
+
+  def listFiles(hadoopPath: Path, recursive: Boolean = false): Iterator[LocatedFileStatus] = {
+    list[LocatedFileStatus](hadoopPath: Path, hdfs.listFiles(_, recursive))
+  }
+
+  def listCorruptFileBlocks(hadoopPath: Path): Iterator[Path] = {
+    list[Path](hadoopPath: Path, hdfs.listCorruptFileBlocks(_))
+  }
+
+  def listLocatedStatus(hadoopPath: Path): Iterator[LocatedFileStatus] = {
+    list[LocatedFileStatus](hadoopPath: Path, hdfs.listLocatedStatus(_))
+  }
+
+  def listStatusIterator(hadoopPath: Path): Iterator[FileStatus] = {
+    list[FileStatus](hadoopPath: Path, hdfs.listStatusIterator(_))
   }
 
   def delete(f: Path, recursive: Boolean): Boolean = {

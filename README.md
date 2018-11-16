@@ -1,6 +1,6 @@
 # GHDFS
 
-Works with HDFS for common operations.
+Works with HDFS for common operations and Scala compatibility.
 
 ## Installation
 
@@ -9,7 +9,7 @@ Package is under com.globo.bigdata.ghdfs
 Include in your dependencies:
 
 ```
-    "com.globo.bigdata" %% "ghdfs" % "0.0.9"
+    "com.globo.bigdata" %% "ghdfs" % "0.0.10"
 ```
 
 ## Usage
@@ -35,13 +35,7 @@ Include in your dependencies:
 ### Get Filesystem Instance
 
 ```
-    hdfs.getFileSystem
-```
-
-### Use normal API
-```
-    val status = hdfs.getFileStatus(new Path("my_path.txt"))
-    status.asInstanceOf[FileStatus].getPath.toString
+    hdfs.getFS.exists(hadoopPath)
 ```
 
 # Tests
@@ -50,21 +44,8 @@ Include in your dependencies:
 sbt test
 ```
 
-# Deploy artifactory
+# Publish
 
 ```
 sbt release
 ```
-
-## Config for artifactory
-
-```
-cat ~/.sbt/.credentials
-
-realm=Artifactory Realm
-host=artifactory.globoi.com
-user=LOGIN
-password=SET YOURS
-```
-
-Where LOGIN is your artifactory login and password is the encrypted from page https://artifactory.globoi.com/artifactory/webapp/#/profile
