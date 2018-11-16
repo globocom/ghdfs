@@ -10,14 +10,8 @@ val buildSettings = Seq(
   resolvers := Resolvers.defaultResoulvers,
   libraryDependencies ++= Dependencies.rootDependencies,
   run in Compile := Defaults.runTask(fullClasspath in Compile, mainClass in(Compile, run), runner in(Compile, run)).evaluated,
-  publishTo := Some(
-    if (isSnapshot.value) {
-      Opts.resolver.sonatypeSnapshots
-    }
-    else {
-      Opts.resolver.sonatypeStaging
-    }
-  ),
+  publishTo := Some("Artifactory Realm" at "https://artifactory.globoi.com/artifactory/libs-release-local"),
+  credentials += Credentials(Path.userHome / ".sbt" / ".credentials"),
   licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
   publishMavenStyle := true
 )
