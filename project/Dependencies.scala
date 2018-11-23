@@ -2,7 +2,7 @@ import sbt._
 object Dependencies {
 
   val projectDependencies = Seq(
-    "org.apache.hadoop" % "hadoop-client" % "2.7.3" excludeAll(
+    "org.apache.hadoop" % "hadoop-client" % "[2.7.3,2.9.9]" excludeAll(
       ExclusionRule("javax.servlet"),
       ExclusionRule("javax.servlet.jsp"),
       ExclusionRule("org.mortbay.jetty"),
