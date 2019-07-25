@@ -64,13 +64,7 @@ class HdfsManager(hdfs: FileSystem) {
   }
 
   def move(sourcePath: Path, destinationPath: Path): Unit = {
-    val destinationFile = this.write(destinationPath)
-    val sourceFile = this.read(sourcePath)
-
-    IOUtils.copy(sourceFile, destinationFile)
-    destinationFile.close()
-    sourceFile.close()
-    hdfs.delete(sourcePath, false)
+    hdfs.rename(sourcePath, destinationPath)
   }
 
   def copyMerge(sourcePath: Path, destinationPath: Path, deleteSource: Boolean, separatorString: String): Boolean = {
