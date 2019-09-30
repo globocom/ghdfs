@@ -1,4 +1,5 @@
 # GHDFS
+[![Build Status](https://travis-ci.com/globocom/ghdfs.svg?branch=master)](https://travis-ci.com/globocom/ghdfs)
 
 Works with HDFS for common operations and Scala compatibility.
 
