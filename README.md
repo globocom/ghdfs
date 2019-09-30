@@ -40,4 +40,4 @@ Include in your dependencies:
 
 ## Contribute
 
-For development and contributing, please follow [Contributing Guide](https://github.com/globocom/ghdfs/blob/master/CONTRIBUTING.md) and ALWAYS respect de [Code of Conduct](https://github.com/globocom/ghdfs/blob/master/CODE_OF_CONDUCT.md)
+For development and contributing, please follow [Contributing Guide](https://github.com/globocom/ghdfs/blob/master/CONTRIBUTING.md) and ALWAYS respect the [Code of Conduct](https://github.com/globocom/ghdfs/blob/master/CODE_OF_CONDUCT.md)
