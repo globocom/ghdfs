@@ -1,4 +1,4 @@
-val compilerVersion = "2.11.11"
+val compilerVersion = "2.11.12"
 
 val buildSettings = Seq(
   name := "ghdfs",
@@ -41,5 +41,5 @@ val buildSettings = Seq(
 lazy val root = (project in file(".")).settings(buildSettings: _*)
 
 scapegoatVersion in ThisBuild := "1.3.3"
-scalaBinaryVersion in ThisBuild := "2.11"
+scalaBinaryVersion in ThisBuild := "2.12"
 scapegoatDisabledInspections := Seq("ExpressionAsStatement", "OptionGet")
