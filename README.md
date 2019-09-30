@@ -17,7 +17,7 @@ Include in your dependencies:
 ```
     val hdfs = HdfsManager(Properties.envOrNone("HADOOP_CONF_DIR"))
     
-    hdfs.write(Path).write(String)
+    hdfs.write(Path)
     
     hdfs.read(Path)
     
@@ -38,22 +38,6 @@ Include in your dependencies:
     hdfs.getFS.exists(hadoopPath)
 ```
 
-# Tests
+## Contribute
 
-```bash
-make test
-```
-
-# Publish Test
-
-Follow this tutorial: https://leonard.io/blog/2017/01/an-in-depth-guide-to-deploying-to-maven-central/
-
-```
-make snapshot
-```
-
-# Publish Test
-
-```
-make release
-```
+For development and contributing, please follow [Contributing Guide](https://github.com/globocom/ghdfs/blob/master/CONTRIBUTING.md)
