@@ -40,6 +40,6 @@ val buildSettings = Seq(
 
 lazy val root = (project in file(".")).settings(buildSettings: _*)
 
-scapegoatVersion in ThisBuild := "1.3.2"
+scapegoatVersion in ThisBuild := "1.3.3"
 scalaBinaryVersion in ThisBuild := "2.11"
 scapegoatDisabledInspections := Seq("ExpressionAsStatement", "OptionGet")
