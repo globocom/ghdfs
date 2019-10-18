@@ -6,6 +6,9 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
 import org.apache.hadoop.fs.{FSDataInputStream, FileSystem, Path}
 
+/**
+ * Integration tests for [[Conversions]]
+ */
 class ConversionsTest extends FlatSpec with Matchers with MockFactory with BeforeAndAfter {
 
   it should "Invoke hasNext of RemoteIterator on hasNext of RemoteIteratorWrapper" in {

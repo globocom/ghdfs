@@ -94,8 +94,9 @@ class HdfsManager(hdfs: FileSystem) {
 
   /**
    * List LocatedFileStatus and block locations of the files in the path
+   *
    * @param hadoopPath hadoopPath's directory
-   * @param recursive true if subdirectories need to be traversed recursively
+   * @param recursive  true if subdirectories need to be traversed recursively
    * @return files statuses
    */
   def listFiles(hadoopPath: Path, recursive: Boolean = false): Iterator[LocatedFileStatus] = {
@@ -104,6 +105,7 @@ class HdfsManager(hdfs: FileSystem) {
 
   /**
    * List corrupted file blocks
+   *
    * @param hadoopPath hadoopPath's directory
    * @return corrupted files
    */
@@ -112,18 +114,32 @@ class HdfsManager(hdfs: FileSystem) {
   }
 
   /**
+   * List the statuses of the files/directories
    *
-   * @param hadoopPath
-   * @return
+   * @param hadoopPath hadoopPath's directory
+   * @return an iterator that traverses statuses of the files/directories in the given path
    */
   def listLocatedStatus(hadoopPath: Path): Iterator[LocatedFileStatus] = {
     list[LocatedFileStatus](hadoopPath: Path, hdfs.listLocatedStatus(_))
   }
 
+  /**
+   * Returns a remote iterator allowing followup calls on demand
+   *
+   * @param hadoopPath hadoopPath's directory
+   * @return remote iterator
+   */
   def listStatusIterator(hadoopPath: Path): Iterator[FileStatus] = {
     list[FileStatus](hadoopPath: Path, hdfs.listStatusIterator(_))
   }
 
+  /**
+   * Delete a file
+   *
+   * @param f         path to delete
+   * @param recursive if directory, true will delete all directory, if file recursive can be se to either true or false
+   * @return true if delete is succesfull or false
+   */
   def delete(f: Path, recursive: Boolean): Boolean = {
     if (hdfs.exists(f)) {
       hdfs.delete(f, recursive)
@@ -131,10 +147,25 @@ class HdfsManager(hdfs: FileSystem) {
     false
   }
 
+  /**
+   * Rename path source to path destination
+   *
+   * @param sourcePath      path to be renamed
+   * @param destinationPath new path after rename
+   */
   def move(sourcePath: Path, destinationPath: Path): Unit = {
     hdfs.rename(sourcePath, destinationPath)
   }
 
+  /**
+   * Copy all files in a directory to one output file
+   *
+   * @param sourcePath      file's source path
+   * @param destinationPath destination after copy
+   * @param deleteSource    true if delete source, false if don't
+   * @param separatorString string separator
+   * @return true if copy and merge is success, false if don't
+   */
   def copyMerge(sourcePath: Path, destinationPath: Path, deleteSource: Boolean, separatorString: String): Boolean = {
     validatePath(sourcePath)
 
@@ -143,16 +174,36 @@ class HdfsManager(hdfs: FileSystem) {
 }
 
 /**
- *
+ * Hdfs manager
  */
 object HdfsManager {
 
   def apply(): HdfsManager = apply(None)
 
+  /**
+   * Apply Hadoop Configuration Directory
+   *
+   * @param hadoopConfDir directory of hadoop configuration
+   * @return
+   */
   def apply(hadoopConfDir: String): HdfsManager = apply(Option(hadoopConfDir))
 
+  /**
+   * Apply new Configuration
+   *
+   * @param hadoopConfDir directory of hadoop configuration
+   * @return
+   */
   def apply(hadoopConfDir: Option[String]): HdfsManager = apply(hadoopConfDir, new Configuration())
 
+  /**
+   * Aplly hadoop configurations
+   *
+   * @param hadoopConfDir directory of hadoop configuration
+   * @param conf          configuration
+   * @param fsFactory     factory file system
+   * @return
+   */
   def apply(hadoopConfDir: Option[String], conf: Configuration, fsFactory: FileSystemFactory = new FileSystemFactory()): HdfsManager = {
 
     if (hadoopConfDir.nonEmpty) {
