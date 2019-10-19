@@ -1,6 +1,7 @@
 package com.globo.bigdata.ghdfs
 
 import java.io.IOException
+import java.io.InputStream
 
 import org.apache.commons.io.IOUtils
 import org.apache.hadoop.conf.Configuration
@@ -33,6 +34,19 @@ class HdfsManager(hdfs: FileSystem) {
 
 
   def write(hadoopPath: Path): FSDataOutputStream = create(hadoopPath: Path)
+
+  def write(hadoopPath: Path, is: InputStream): Boolean = {
+    val fsOutputStream = create(hadoopPath)
+    
+    try {
+      IOUtils.copy(is, fsOutputStream)
+      true
+    }
+    finally {
+        is.close()
+        fsOutputStream.close()
+    }
+  }
 
   def list[T](hadoopPath: Path, caller: Path => RemoteIterator[T]): Iterator[T] = {
     RemoteIteratorWrapper[T](

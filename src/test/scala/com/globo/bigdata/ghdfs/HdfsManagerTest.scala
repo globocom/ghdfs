@@ -10,6 +10,7 @@ import org.apache.hadoop.fs.{FileStatus, FileSystem, Path}
 import java.io.IOException
 
 import org.apache.hadoop.hdfs.DistributedFileSystem
+import org.apache.commons.io.IOUtils
 
 
 class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with BeforeAndAfter {
@@ -58,6 +59,19 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
     val hdfsReader = new HdfsManager(fs)
     val returnedClass = hdfsReader.write(testPath).getClass.getName
     returnedClass shouldEqual "org.apache.hadoop.fs.FSDataOutputStream"
+
+    new File(testPath.toString).delete
+    new File("src/test/resources/.new.csv.crc").delete
+  }
+
+  it should "Write to haddoop path from input stream" in {
+    val testPath = new Path("src/test/resources/new.csv")
+    val fs = FileSystem.get(new Configuration())
+    val is = IOUtils.toInputStream("content")
+    val hdfsReader = new HdfsManager(fs)
+    val returnedClass = hdfsReader.write(testPath, is).getClass.getName
+    returnedClass shouldEqual "boolean"
+    IOUtils.toString(hdfsReader.read(testPath)) shouldEqual "content"
 
     new File(testPath.toString).delete
     new File("src/test/resources/.new.csv.crc").delete
