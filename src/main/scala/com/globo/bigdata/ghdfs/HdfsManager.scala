@@ -35,15 +35,15 @@ class HdfsManager(hdfs: FileSystem) {
 
   def write(hadoopPath: Path): FSDataOutputStream = create(hadoopPath: Path)
 
-  def write(hadoopPath: Path, is: InputStream): Boolean = {
-    val fsOutputStream = create(hadoopPath)
+  def write(hadoopPath: Path, input: InputStream): Boolean = {
+    val fsOutputStream = write(hadoopPath)
     
     try {
-      IOUtils.copy(is, fsOutputStream)
+      IOUtils.copy(input, fsOutputStream)
       true
     }
     finally {
-        is.close()
+        input.close()
         fsOutputStream.close()
     }
   }

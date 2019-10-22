@@ -20,6 +20,8 @@ Include in your dependencies:
     
     hdfs.write(Path)
     
+    hdfs.write(Path, InputStream)
+
     hdfs.read(Path)
     
     hdfs.status(Path)
