@@ -14,6 +14,11 @@ class ChecksumHelper(algorithm: String) {
     stringHash
   }
 
+  def verify(checksum:String, inputStream: FSDataInputStream): Boolean = {
+    val newChecksum = this.generate(inputStream)
+    checksum.equals(newChecksum)
+  }
+
 
 }
 
