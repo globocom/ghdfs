@@ -21,6 +21,8 @@ Package is under com.globo.bigdata.ghdfs
     
     hdfs.write(Path)
     
+    hdfs.write(Path, InputStream)
+
     hdfs.read(Path)
     
     hdfs.status(Path)
