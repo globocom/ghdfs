@@ -3,6 +3,7 @@ package com.globo.bigdata.ghdfs
 import java.io.IOException
 import java.io.InputStream
 
+import org.apache.commons.io.IOUtils
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs._
 
@@ -79,6 +80,13 @@ class HdfsManager(hdfs: FileSystem) {
    */
   def write(hadoopPath: Path): FSDataOutputStream = create(hadoopPath: Path)
 
+  /**
+   * Create a file at the indicated path and write to it from an InputStream
+   *
+   * @param hadoopPath hadoopPath's value
+   * @param input source data of the new file
+   * @return true if write to file succeeded
+   */
   def write(hadoopPath: Path, input: InputStream): Boolean = {
     val fsOutputStream = write(hadoopPath)
 
@@ -87,8 +95,8 @@ class HdfsManager(hdfs: FileSystem) {
       true
     }
     finally {
-        input.close()
-        fsOutputStream.close()
+      input.close()
+      fsOutputStream.close()
     }
   }
 
