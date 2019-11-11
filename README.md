@@ -1,21 +1,22 @@
-# GHDFS
 [![Build Status](https://travis-ci.com/globocom/ghdfs.svg?branch=master)](https://travis-ci.com/globocom/ghdfs)
 
-Works with HDFS for common operations and Scala compatibility.
+# GHDFS
+
+> Works with HDFS for common operations and Scala compatibility.
 
 ## Installation
 
 Package is under com.globo.bigdata.ghdfs
 
-Include in your dependencies:
+- Include in your dependencies:
 
-```
+```branch
     "com.globo.bigdata" %% "ghdfs" % "0.0.13"
 ```
 
 ## Usage
 
-```
+```branch
     val hdfs = HdfsManager(Properties.envOrNone("HADOOP_CONF_DIR"))
     
     hdfs.write(Path)
@@ -37,7 +38,7 @@ Include in your dependencies:
 
 ### Get Filesystem Instance
 
-```
+```branch
     hdfs.getFS.exists(hadoopPath)
 ```
 

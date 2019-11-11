@@ -13,6 +13,9 @@ import org.apache.hadoop.hdfs.DistributedFileSystem
 import org.apache.commons.io.IOUtils
 
 
+/**
+ * Integrations tests for [[HdfsManager]]
+ */
 class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with BeforeAndAfter {
 
   it should "Get Local Filesystem without hadoop configuration" in {
@@ -105,7 +108,7 @@ class HdfsManagerTest extends FlatSpec with Matchers with MockFactory with Befor
     val toMergePath = new Path("doesnt_exists")
     val destinationPath = new Path("src/test/resources/merged_file")
 
-    assertThrows[IOException]{
+    assertThrows[IOException] {
       hdfsReader.copyMerge(toMergePath, destinationPath, false, "\n")
     }
 
