@@ -21,8 +21,21 @@ class ChecksumHelper(algorithm: String) {
    * @param path file's path
    * @return the string checksum of a file
    */
-    def getFileChecksum(hdfs: FileSystem, path: Path): String = {
-      hdfs.getFileChecksum(path).toString
+  def getFileChecksum(hdfs: FileSystem, path: Path): String = {
+    hdfs.getFileChecksum(path).toString
+  }
+
+  /**
+   * Compare the checksum of a given file with a file inside hdfs
+   *
+   * @param hdfs hadoopPath's value
+   * @param path file's path
+   * @param fileChecksum file's checksum
+   * @return if both checksum are equal or not
+   */
+  def isEqualFileChecksum(hdfs: FileSystem, path: Path, fileChecksum: String): Boolean = {
+    val internalFile = getFileChecksum(hdfs, path)
+    internalFile == fileChecksum
   }
 
 
